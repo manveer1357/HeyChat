@@ -18,5 +18,7 @@
   "bugs": {
     "url": "https://github.com/manveer1357/HeyChat/issues"
   },
-  "homepage": "https://github.com/manveer1357/HeyChat#readme"
+  "homepage": "https://github.com/manveer1357/HeyChat#readme",
+  "dependencies": {
+  }
 }
