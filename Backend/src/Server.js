@@ -1,25 +1,25 @@
 import express from "express";
-import dotenv from "dotenv";
+import cookieParser from "cookie-parser"
 import path from "path";
 
 import router from "./routes/auth.route.js";
 import msgRoutes from "./routes/msg.route.js";
 import { connectDB } from "./lib/db.js";
-
-dotenv.config();
+import { ENV } from "./lib/env.js";
 
 const app = express();
 const __dirname = path.resolve();
 
-const PORT = process.env.PORT || 3000;
+const PORT = ENV.PORT || 3000;
 
 app.use(express.json()) //req.body
+app.use(cookieParser())
 
 app.use("/api/auth", router);
 app.use("/api/msg", msgRoutes);
 
 //make ready for deployment
-if (process.env.NODE_ENV === "production") {
+if (ENV.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../Frontend/dist")));
 
   app.get("*", (req, res) => {
