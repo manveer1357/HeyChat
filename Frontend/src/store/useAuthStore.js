@@ -18,7 +18,6 @@ export const useAuthStore = create((set) => ({
     }
   },
 
-  
   signup: async (data) => {
     set({ isSigningUp: true });
     try {
@@ -49,13 +48,23 @@ export const useAuthStore = create((set) => ({
 
   logout: async () => {
     try {
-      await axiosInstance.post("/auth/logout")
-      set({authUser: null})
-      toast.success("Logged out successfully!")
+      await axiosInstance.post("/auth/logout");
+      set({ authUser: null });
+      toast.success("Logged out successfully!");
     } catch (error) {
-      toast.error("Error logging out. Please try again.")
-      console.log(error)
+      toast.error("Error logging out. Please try again.");
+      console.log(error);
     }
-  }
+  },
 
+  updateProfile: async (data) => {
+    try {
+      const res = await axiosInstance.put("/auth/update-profile", data);
+      set({ authUser: res.data });
+      toast.success("Profile updated successfully");
+    } catch (error) {
+      console.log("Error in update profile:", error);
+      toast.error(error.response.data.message);
+    }
+  },
 }));
