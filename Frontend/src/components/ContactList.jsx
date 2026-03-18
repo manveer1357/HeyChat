@@ -24,7 +24,7 @@ function ContactList() {
             <div
             // className={`avatar ${onlineUsers.includes(contact._id) ? "online" : "offline"}`} ////TODO WITH SOCKET.IO
             >
-              <div className="size-12 rounded-full">
+              <div className="size-12 rounded-full overflow-hidden">
                 <img
                   src={contact.profilePic || "/avatar.png"}
                   alt={contact.fullName}
