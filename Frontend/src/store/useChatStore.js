@@ -20,6 +20,7 @@ export const useChatStore = create((set, get) => ({
 
   setActiveTab: (tab) => set({ activeTab: tab }),
   setSelectedUser: (selectedUser) => set({ selectedUser }),
+
   getAllContacts: async () => {
     set({ isUsersLoading: true });
     try {
@@ -31,7 +32,6 @@ export const useChatStore = create((set, get) => ({
       set({ isUsersLoading: false });
     }
   },
-
   getMyChatPartners: async () => {
     set({ isUsersLoading: true });
     try {
@@ -50,7 +50,7 @@ export const useChatStore = create((set, get) => ({
       const res = await axiosInstance.get(`/msg/${userId}`);
       set({ messages: res.data });
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Failed to load messages");
+      toast.error(error.response?.data?.message || "Something went wrong");
     } finally {
       set({ isMessagesLoading: false });
     }
@@ -75,14 +75,39 @@ export const useChatStore = create((set, get) => ({
     set({ messages: [...messages, optimisticMessage] });
 
     try {
-      const res = await axiosInstance.post(
-        `/msg/send/${selectedUser._id}`,
-        messageData,
-      );
+      const res = await axiosInstance.post(`/msg/send/${selectedUser._id}`, messageData);
       set({ messages: messages.concat(res.data) });
     } catch (error) {
+      // remove optimistic message on failure
       set({ messages: messages });
       toast.error(error.response?.data?.message || "Something went wrong");
     }
+  },
+
+  subscribeToMessages: () => {
+    const { selectedUser, isSoundEnabled } = get();
+    if (!selectedUser) return;
+
+    const socket = useAuthStore.getState().socket;
+
+    socket.on("newMessage", (newMessage) => {
+      const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser._id;
+      if (!isMessageSentFromSelectedUser) return;
+
+      const currentMessages = get().messages;
+      set({ messages: [...currentMessages, newMessage] });
+
+      if (isSoundEnabled) {
+        const notificationSound = new Audio("/sounds/notification.mp3");
+
+        notificationSound.currentTime = 0; // reset to start
+        notificationSound.play().catch((e) => console.log("Audio play failed:", e));
+      }
+    });
+  },
+
+  unsubscribeToMessages: () => {
+    const socket = useAuthStore.getState().socket;
+    socket.off("newMessage");
   },
 }));
