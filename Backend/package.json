@@ -8,7 +8,7 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon src/Server.js",
-    "start": "node src/server.js"
+    "start": "node src/Server.js"
   },
   "dependencies": {
     "@arcjet/inspect": "^1.3.0",
