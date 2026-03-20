@@ -22,6 +22,19 @@ export const getMessagesByContactId = async (req, res) => {
     const myId = req.user._id;
     const { id: contactToChatId } = req.params;
 
+    // Mark all unread messages from this contact as read
+    const updateResult = await Message.updateMany(
+      { senderId: contactToChatId, receiverId: myId, status: { $ne: "read" } },
+      { $set: { status: "read" } }
+    );
+
+    if (updateResult.modifiedCount > 0) {
+      const senderSocketId = getRecieverSocketId(contactToChatId);
+      if (senderSocketId) {
+        io.to(senderSocketId).emit("messagesRead", { readerId: myId });
+      }
+    }
+
     const messages = await Message.find({
       $or: [
         { senderId: myId, receiverId: contactToChatId },
@@ -63,16 +76,18 @@ export const sendMessage = async (req, res) => {
       imageUrl = uploadedResponse.secure_url;
     }
 
+    const receiverSocketId = getRecieverSocketId(receiverId);
+
     const newMessage = new Message({
       senderId,
       receiverId,
       text,
       image: imageUrl,
+      status: receiverSocketId ? "delivered" : "sent",
     });
 
     await newMessage.save();
 
-    const receiverSocketId = getRecieverSocketId(receiverId)
     if(receiverSocketId){
       io.to(receiverSocketId).emit("newMessage", newMessage)
     }
@@ -110,6 +125,38 @@ export const getChatPartners = async (req, res) => {
     res.status(200).json(chatPartners);
   } catch (error) {
     console.error("Error in getChatPartners:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const markMessageAsRead = async (req, res) => {
+  try {
+    const { id: messageId } = req.params;
+    const myId = req.user._id;
+
+    const message = await Message.findById(messageId);
+    if (!message) {
+      return res.status(404).json({ message: "Message not found" });
+    }
+
+    // Only the receiver can mark a message as read
+    if (message.receiverId.toString() !== myId.toString()) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    if (message.status !== "read") {
+      message.status = "read";
+      await message.save();
+
+      const senderSocketId = getRecieverSocketId(message.senderId);
+      if (senderSocketId) {
+        io.to(senderSocketId).emit("messagesRead", { readerId: myId });
+      }
+    }
+
+    res.status(200).json(message);
+  } catch (error) {
+    console.error("Error in markMessageAsRead:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };

@@ -5,6 +5,7 @@ import ChatHeader from "./ChatHeader";
 import NoChatHistoryPlaceholder from "./NoChatHistoryPlaceholder";
 import MessageInput from "./MessageInput";
 import MessagesLoadingSkeleton from "./MessagesLoadingSkeleton";
+import { Check, CheckCheck } from "lucide-react";
 
 function ChatContainer() {
   const {
@@ -63,8 +64,19 @@ function ChatContainer() {
                     />
                   )}
                   {msg.text && <p className="mt-2">{msg.text}</p>}
-                  <p className="text-xs mt-1 opacity-75 flex items-center gap-1">
+                  <p className="text-xs mt-1 opacity-75 flex items-center justify-end gap-1">
                     {new Date(msg.createdAt).toISOString().slice(11, 16)}
+                    {msg.senderId === authUser._id && (
+                      <span className="ml-1">
+                        {msg.status === "read" ? (
+                          <CheckCheck className="w-4 h-4 text-red-500" />
+                        ) : msg.status === "delivered" ? (
+                          <CheckCheck className="w-4 h-4 text-slate-400" />
+                        ) : (
+                          <Check className="w-4 h-4 text-slate-400" />
+                        )}
+                      </span>
+                    )}
                   </p>
                 </div>
               </div>

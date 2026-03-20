@@ -69,6 +69,7 @@ export const useChatStore = create((set, get) => ({
       text: messageData.text,
       image: messageData.image,
       createdAt: new Date().toISOString(),
+      status: "sent",
       isOptimistic: true, // flag to identify optimistic messages (optional)
     };
     // immidetaly update the ui by adding the message
@@ -94,6 +95,10 @@ export const useChatStore = create((set, get) => ({
       const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser._id;
       if (!isMessageSentFromSelectedUser) return;
 
+      // Mark message as read since chat is currently open
+      axiosInstance.put(`/msg/${newMessage._id}/read`).catch((err) => console.error(err));
+      newMessage.status = "read";
+
       const currentMessages = get().messages;
       set({ messages: [...currentMessages, newMessage] });
 
@@ -104,10 +109,19 @@ export const useChatStore = create((set, get) => ({
         notificationSound.play().catch((e) => console.log("Audio play failed:", e));
       }
     });
+
+    socket.on("messagesRead", ({ readerId }) => {
+      set({
+        messages: get().messages.map((msg) =>
+          msg.receiverId === readerId ? { ...msg, status: "read" } : msg
+        ),
+      });
+    });
   },
 
   unsubscribeToMessages: () => {
     const socket = useAuthStore.getState().socket;
     socket.off("newMessage");
+    socket.off("messagesRead");
   },
 }));

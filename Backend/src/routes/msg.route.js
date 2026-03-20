@@ -4,6 +4,7 @@ import {
   getMessagesByContactId,
   sendMessage,
   getChatPartners,
+  markMessageAsRead,
 } from "../controllers/msg.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 import { arcjetProtection } from "../middleware/arcjet.middleware.js";
@@ -16,6 +17,7 @@ router.get("/contacts", getAllContacts);
 router.get("/chats", getChatPartners);
 router.get("/:id", getMessagesByContactId);
 router.post("/send/:id", sendMessage);
+router.put("/:id/read", markMessageAsRead);
 
 router.post("/send", (req, res) => {
   res.send("Send message endpoint");
