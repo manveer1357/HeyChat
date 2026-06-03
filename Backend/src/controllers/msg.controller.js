@@ -25,7 +25,7 @@ export const getMessagesByContactId = async (req, res) => {
     // Mark all unread messages from this contact as read
     const updateResult = await Message.updateMany(
       { senderId: contactToChatId, receiverId: myId, status: { $ne: "read" } },
-      { $set: { status: "read" } }
+      { $set: { status: "read" } },
     );
 
     if (updateResult.modifiedCount > 0) {
@@ -40,7 +40,7 @@ export const getMessagesByContactId = async (req, res) => {
         { senderId: myId, receiverId: contactToChatId },
         { senderId: contactToChatId, receiverId: myId },
       ],
-    });
+    }).sort({ createdAt: 1 });
 
     res.status(200).json(messages);
   } catch (error) {
@@ -88,10 +88,9 @@ export const sendMessage = async (req, res) => {
 
     await newMessage.save();
 
-    if(receiverSocketId){
-      io.to(receiverSocketId).emit("newMessage", newMessage)
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("newMessage", newMessage);
     }
-
 
     res.status(201).json(newMessage);
   } catch (error) {

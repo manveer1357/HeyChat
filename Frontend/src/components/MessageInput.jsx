@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import toast from "react-hot-toast";
-import { ImageIcon, SendIcon, XIcon } from "lucide-react";
+import { Camera, ImageIcon, SendIcon, XIcon } from "lucide-react";
 
 function MessageInput() {
   const [text, setText] = useState("");
@@ -41,7 +41,7 @@ function MessageInput() {
   };
 
   return (
-    <div className="p-4 border-t border-slate-700/50">
+    <div className="px-4 md:py-4 py-2 border-t border-slate-700/50 bg-slate-800">
       {imagePreview && (
         <div className="max-w-3xl mx-auto mb-3 flex items-center">
           <div className="relative">
@@ -65,6 +65,16 @@ function MessageInput() {
         onSubmit={handleSendMessage}
         className="max-w-3xl mx-auto flex gap-2 md:gap-4"
       >
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          className={`bg-slate-800/50 text-slate-400 flex items-center justify-center hover:text-slate-200 rounded-lg px-2 md:px-4 transition-colors ${
+            imagePreview ? "text-cyan-500" : ""
+          }`}
+        >
+          <Camera className="w-5 h-5" />
+        </button>
+
         <input
           type="text"
           value={text}
@@ -83,15 +93,6 @@ function MessageInput() {
           className="hidden"
         />
 
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          className={`bg-slate-800/50 text-slate-400 flex items-center justify-center hover:text-slate-200 rounded-lg px-3 md:px-4 transition-colors ${
-            imagePreview ? "text-cyan-500" : ""
-          }`}
-        >
-          <ImageIcon className="w-5 h-5" />
-        </button>
         <button
           type="submit"
           disabled={!text.trim() && !imagePreview}
