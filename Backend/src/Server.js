@@ -1,5 +1,5 @@
 import express from "express";
-import cookieParser from "cookie-parser"
+import cookieParser from "cookie-parser";
 import path from "path";
 import cors from "cors";
 
@@ -13,9 +13,9 @@ const __dirname = path.resolve();
 
 const PORT = ENV.PORT || 3000;
 
-app.use(express.json({limit:"5mb"})) //req.body
-app.use(cors({origin: ENV.CLIENT_URL, credentials: true})) //CORS
-app.use(cookieParser())
+app.use(express.json({ limit: "5mb" })); //req.body
+app.use(cors({ origin: ENV.CLIENT_URL, credentials: true })); //CORS
+app.use(cookieParser());
 
 app.use("/api/auth", router);
 app.use("/api/msg", msgRoutes);
@@ -30,6 +30,6 @@ if (ENV.NODE_ENV === "production") {
 }
 
 server.listen(3000, () => {
-  console.log("Server started at port: " + PORT)
-  connectDB()
+  console.log("Server started at port: " + PORT);
+  connectDB();
 });

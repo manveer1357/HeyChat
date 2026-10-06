@@ -21,7 +21,7 @@ function ChatHeader() {
   }, [setSelectedUser]);
 
   return (
-    <div className="flex justify-between items-center bg-slate-800 border-b border-slate-700/50 max-h-[84px] px-6 flex-1">
+    <div className="flex justify-between items-center backdrop-blur-md bg-gradient-to-b from-black/15 to-transparent max-h-[84px] px-6 flex-1">
       <div className="flex items-center space-x-3">
         <div className={`avatar ${isOnline ? "online" : "offline"}`}>
           <div className="w-12 rounded-full">
@@ -40,7 +40,7 @@ function ChatHeader() {
           </p>
         </div>
       </div>
-      <button>
+      <button className="p-2 backdrop-blur-md border-2 border-slate-800 rounded-full">
         <X
           onClick={() => setSelectedUser(null)}
           className="w-5 h-5 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"

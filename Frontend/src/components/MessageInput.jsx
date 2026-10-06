@@ -41,7 +41,7 @@ function MessageInput() {
   };
 
   return (
-    <div className="px-4 md:py-4 py-2 border-t border-slate-700/50 bg-slate-800">
+    <div className="px-4 md:py-4 py-2 backdrop-blur-md bg-gradient-to-t from-black/10 to-transparent">
       {imagePreview && (
         <div className="max-w-3xl mx-auto mb-3 flex items-center">
           <div className="relative">
@@ -63,12 +63,12 @@ function MessageInput() {
 
       <form
         onSubmit={handleSendMessage}
-        className="max-w-3xl mx-auto flex gap-2 md:gap-4"
+        className="max-w-3xl mx-auto flex gap-2 md:gap-4 items-center"
       >
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className={`bg-slate-800/50 text-slate-400 flex items-center justify-center hover:text-slate-200 rounded-lg px-2 md:px-4 transition-colors ${
+          className={`backdrop-blur-md border-2 border-slate-800 rounded-full text-slate-400 flex items-center justify-center hover:text-slate-200 px-2 md:p-2.5 transition-colors ${
             imagePreview ? "text-cyan-500" : ""
           }`}
         >
@@ -81,7 +81,7 @@ function MessageInput() {
           onChange={(e) => {
             setText(e.target.value);
           }}
-          className="flex-1 min-w-0 bg-slate-800/50 border border-slate-700/50 rounded-lg py-2 px-3 md:px-4 text-sm md:text-base"
+          className="relative z-0 flex-1 min-w-0 bg-transparent backdrop-blur-md border-2 border-slate-800 rounded-full py-2 px-3 md:px-4 transition-all ease-in-out duration-300 text-sm md:text-base text-white outline-none focus:z-10 focus:scale-x-[1.03] focus:border-cyan-400/60 focus:bg-slate-900/30 focus:ring-4 focus:ring-cyan-400/10"
           placeholder="Type your message..."
         />
 
@@ -96,7 +96,7 @@ function MessageInput() {
         <button
           type="submit"
           disabled={!text.trim() && !imagePreview}
-          className="bg-gradient-to-r flex items-center justify-center from-cyan-500 to-cyan-600 text-white rounded-lg px-3 md:px-4 py-2 font-medium hover:from-cyan-600 hover:to-cyan-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center justify-center backdrop-blur-md border-2 border-slate-800 rounded-full p-2.5 font-medium text-cyan-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <SendIcon className="w-5 h-5" />
         </button>
