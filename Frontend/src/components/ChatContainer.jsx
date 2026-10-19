@@ -74,20 +74,20 @@ function ChatContainer() {
   let lastProcessedDateLabel = null;
 
   return (
-    <>
+    <section className="relative w-full min-h-full grid grid-rows-1 overflow-x-hidden">
+      <div
+        className="fixed inset-0 pointer-events-none -z-10"
+        style={{
+          backgroundImage: "url('/chat-bg.png')",
+          backgroundRepeat: "repeat",
+          backgroundSize: "400px",
+          opacity: 0.09, // Change this freely! Only the doodle will fade.
+        }}
+      />
       <ChatHeader />
-      <div className="flex-1 relative px-2 md:px-6 overflow-y-auto py-8">
-        <div
-          className="fixed inset-0 pointer-events-none -z-10"
-          style={{
-            backgroundImage: "url('/chat-bg.png')",
-            backgroundRepeat: "repeat",
-            backgroundSize: "400px",
-            opacity: 0.1, // Change this freely! Only the doodle will fade.
-          }}
-        />
+      <div className="row-start-1 col-start-1 px-2 md:px-6 w-full overflow-y-auto py-16">
         {messages.length > 0 && !isMessagesLoading ? (
-          <div className="max-w-3xl mx-auto space-y-6">
+          <div className="relative max-w-3xl mx-auto space-y-6">
             {messages.map((msg) => {
               // 1. Calculate the day label for this message
               const currentMessageDateLabel = getChatDayLabel(msg.createdAt);
@@ -107,7 +107,7 @@ function ChatContainer() {
                   className={showDateIndicator ? "space-y-6" : ""}
                 >
                   {showDateIndicator && (
-                    <div className="sticky top-0 z-10 flex justify-center pointer-events-none">
+                    <div className="sticky top-5 z-9 flex justify-center pointer-events-none">
                       <span className="bg-slate-900/80 backdrop-blur-sm text-slate-300 text-xs px-3 py-1 rounded-lg shadow-md font-medium tracking-wide">
                         {currentMessageDateLabel}
                       </span>
@@ -149,7 +149,13 @@ function ChatContainer() {
                       )}
                     </div>
                     <p className="chat-footer text-xs mt-1 opacity-75 flex items-center justify-end gap-1">
-                      {new Date(msg.createdAt).toISOString().slice(11, 16)}
+                      {new Date(msg.createdAt)
+                        .toLocaleString("en-IN", {
+                          timezone: "Asia/Kolkata",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                        .toUpperCase()}
                       {msg.senderId === authUser._id && (
                         <span className="ml-1">
                           {msg.status === "read" ? (
@@ -175,7 +181,7 @@ function ChatContainer() {
         )}
       </div>
       <MessageInput />
-    </>
+    </section>
   );
 }
 
