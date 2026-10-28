@@ -14,7 +14,26 @@ const __dirname = path.resolve();
 const PORT = ENV.PORT || 3000;
 
 app.use(express.json({ limit: "5mb" })); //req.body
-app.use(cors({ origin: ENV.CLIENT_URL, credentials: true })); //CORS
+
+if (process.env.NODE_ENV !== "production") {
+  // Option A: Allow all origins and methods in development
+  app.use(
+    cors({
+      origin: true,
+      credentials: true,
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"],
+    }),
+  );
+} else {
+  // Option B: Restrict origins in production
+  app.use(
+    cors({
+      origin: ENV.CLIENT_URL,
+    }),
+  );
+}
+
 app.use(cookieParser());
 
 app.use("/api/auth", router);

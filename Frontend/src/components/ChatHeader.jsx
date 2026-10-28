@@ -21,7 +21,7 @@ function ChatHeader() {
   }, [setSelectedUser]);
 
   return (
-    <div className="sticky top-0 z-10 px-6 md:py-4 py-2 flex justify-between items-center max-h-[84px] row-start-1 col-start-1 self-start">
+    <div className="sticky top-0 z-10 px-6 py-4 flex justify-between items-center md:max-h-[84px] row-start-1 col-start-1 self-start">
       <div
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none backdrop-blur-[40px] bg-gradient-to-t from-transparent to-slate-900/80"
@@ -48,10 +48,10 @@ function ChatHeader() {
           </p>
         </div>
       </div>
-      <button className="relative z-10 p-2 backdrop-blur-md border-2 border-slate-800 rounded-full">
+      <button className="relative z-10 p-2.5 md:p-2 backdrop-blur-md border-2 border-slate-800 rounded-full">
         <X
           onClick={() => setSelectedUser(null)}
-          className="w-5 h-5 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+          className="w-6 h-6 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
         />
       </button>
     </div>

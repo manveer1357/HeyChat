@@ -8,7 +8,6 @@ import ContactList from "../components/ContactList";
 import ChatContainer from "../components/ChatContainer";
 import NoConversationPlaceholder from "../components/NoConversationPlaceholder";
 
-
 function ChatPage() {
   const { activeTab, selectedUser } = useChatStore();
 
@@ -16,7 +15,9 @@ function ChatPage() {
     <div className="relative w-full max-w-6xl h-[100dvh] md:h-[94dvh]">
       <BorderAnimatedContainer>
         {/* LEFT SIDE */}
-        <div className={`w-full md:w-80 bg-slate-800/50 backdrop-blur-sm flex flex-col ${selectedUser ? "hidden md:flex" : ""}`}>
+        <div
+          className={`w-full md:w-80 bg-slate-800/50 backdrop-blur-sm flex flex-col ${selectedUser ? "hidden md:flex" : ""}`}
+        >
           <ProfileHeader />
           <ActiveTabSwitch />
 
@@ -26,7 +27,9 @@ function ChatPage() {
         </div>
 
         {/* RIGHT SIDE */}
-        <div className={`flex-1 flex flex-col bg-slate-900/50 backdrop-blur-sm min-w-0 ${selectedUser ? "flex" : "hidden md:flex"}`}>
+        <div
+          className={`flex-1 flex flex-col bg-slate-900/50 backdrop-blur-sm min-w-0 ${selectedUser ? "flex" : "hidden md:flex"}`}
+        >
           {selectedUser ? <ChatContainer /> : <NoConversationPlaceholder />}
         </div>
       </BorderAnimatedContainer>

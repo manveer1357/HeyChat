@@ -41,7 +41,7 @@ function MessageInput() {
   };
 
   return (
-    <div className="relative w-full row-start-1 col-start-1 self-end px-4 md:py-4 py-2">
+    <div className="relative w-full row-start-1 col-start-1 self-end px-4 py-4">
       <div
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none backdrop-blur-[40px] bg-gradient-to-b from-transparent to-slate-900/80"
@@ -77,11 +77,11 @@ function MessageInput() {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className={`backdrop-blur-md border-2 border-slate-800 rounded-full text-slate-400 flex items-center justify-center hover:text-slate-200 p-2 md:p-2.5 transition-colors ${
+            className={`backdrop-blur-md border-2 border-slate-800 rounded-full text-slate-400 flex items-center justify-center hover:text-slate-200 p-4 md:p-2.5 transition-colors ${
               imagePreview ? "text-cyan-500" : ""
             }`}
           >
-            <Camera className="w-5 h-5" />
+            <Camera className="w-6 h-6" />
           </button>
 
           <input
@@ -90,7 +90,7 @@ function MessageInput() {
             onChange={(e) => {
               setText(e.target.value);
             }}
-            className="relative z-0 flex-1 min-w-0 bg-transparent backdrop-blur-md border-2 border-slate-800 rounded-full py-2 px-3 md:px-4 transition-all ease-in-out duration-300 text-sm md:text-base text-white outline-none focus:z-10 focus:scale-x-[1.03] focus:border-cyan-400/60 focus:bg-slate-900/30 focus:ring-4 focus:ring-cyan-400/10"
+            className="relative z-0 flex-1 min-w-0 bg-transparent backdrop-blur-md border-2 border-slate-800 rounded-full py-4 md:py-2 px-4 transition-all ease-in-out duration-300 text-sm md:text-base text-white outline-none focus:z-10 focus:scale-x-[1.03] focus:border-cyan-400/60 focus:bg-slate-900/30 focus:ring-4 focus:ring-cyan-400/10"
             placeholder="Type your message..."
           />
 
@@ -105,9 +105,9 @@ function MessageInput() {
           <button
             type="submit"
             disabled={!text.trim() && !imagePreview}
-            className="flex items-center justify-center backdrop-blur-md border-2 border-slate-800 rounded-full p-2.5 font-medium text-cyan-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center justify-center backdrop-blur-md border-2 border-slate-800 rounded-full p-4 md:p-2.5 font-medium text-cyan-500 disabled:text-gray-500 transition-all ease-in-out duration-500 disabled:cursor-not-allowed"
           >
-            <SendIcon className="w-5 h-5" />
+            <SendIcon className="w-6 h-6" />
           </button>
         </form>
       </div>

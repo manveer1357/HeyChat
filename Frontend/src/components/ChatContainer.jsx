@@ -71,7 +71,18 @@ function ChatContainer() {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
-  let lastProcessedDateLabel = null;
+  const messageGroups = messages.reduce((groups, msg) => {
+    const label = getChatDayLabel(msg.createdAt);
+    const lastGroup = groups[groups.length - 1];
+
+    if (lastGroup?.label === label) {
+      lastGroup.messages.push(msg);
+    } else {
+      groups.push({ label, messages: [msg] });
+    }
+
+    return groups;
+  }, []);
 
   return (
     <section className="relative w-full min-h-full grid grid-rows-1 overflow-x-hidden">
@@ -88,87 +99,80 @@ function ChatContainer() {
       <div className="row-start-1 col-start-1 px-2 md:px-6 w-full overflow-y-auto py-16">
         {messages.length > 0 && !isMessagesLoading ? (
           <div className="relative max-w-3xl mx-auto space-y-6">
-            {messages.map((msg) => {
-              // 1. Calculate the day label for this message
-              const currentMessageDateLabel = getChatDayLabel(msg.createdAt);
-
-              // 2. Check if the day has changed compared to the previous message
-              const showDateIndicator =
-                currentMessageDateLabel !== lastProcessedDateLabel;
-
-              // 3. Update our tracker for the next iteration
-              lastProcessedDateLabel = currentMessageDateLabel;
-
-              const isLoneEmoji = isSingleEmoji(msg.text) && !msg.image;
-
+            {messageGroups.map((group) => {
               return (
                 <div
-                  key={msg._id}
-                  className={showDateIndicator ? "space-y-6" : ""}
+                  key={`${group.label}-${group.messages[0]._id}`}
+                  className="space-y-6"
                 >
-                  {showDateIndicator && (
-                    <div className="sticky top-5 z-9 flex justify-center pointer-events-none">
-                      <span className="bg-slate-900/80 backdrop-blur-sm text-slate-300 text-xs px-3 py-1 rounded-lg shadow-md font-medium tracking-wide">
-                        {currentMessageDateLabel}
-                      </span>
-                    </div>
-                  )}
-                  <div
-                    className={`chat ${msg.senderId === authUser._id ? "chat-end" : "chat-start"}`}
-                  >
-                    <div
-                      className={`chat-bubble relative text-sm md:text-base max-w-[75%] w-fit md:max-w-md break-words ${
-                        isLoneEmoji
-                          ? "bg-transparent px-0 select-none" // WhatsApp style: No bubble, massive font
-                          : msg.senderId === authUser._id
-                            ? "bg-cyan-600 text-white"
-                            : msg.image && !msg.text
-                              ? "bg-transparent px-0"
-                              : "bg-slate-800 text-slate-200"
-                      }`}
-                    >
-                      {msg.image && (
-                        <img
-                          src={msg.image}
-                          alt="Shared"
-                          className="rounded-lg max-h-48 h-fit w-fit object-contain"
-                        />
-                      )}
-                      {msg.text && (
-                        <p
-                          className={
-                            isLoneEmoji
-                              ? "text-right text-5xl"
-                              : msg.senderId === authUser._id
-                                ? "text-end align-text-bottom"
-                                : "text-start align-text-bottom"
-                          }
-                        >
-                          {msg.text}
-                        </p>
-                      )}
-                    </div>
-                    <p className="chat-footer text-xs mt-1 opacity-75 flex items-center justify-end gap-1">
-                      {new Date(msg.createdAt)
-                        .toLocaleString("en-IN", {
-                          timezone: "Asia/Kolkata",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })
-                        .toUpperCase()}
-                      {msg.senderId === authUser._id && (
-                        <span className="ml-1">
-                          {msg.status === "read" ? (
-                            <CheckCheck className="w-4 h-4 text-blue-500" />
-                          ) : msg.status === "delivered" ? (
-                            <CheckCheck className="w-4 h-4 text-slate-400" />
-                          ) : (
-                            <Check className="w-4 h-4 text-slate-400" />
-                          )}
-                        </span>
-                      )}
-                    </p>
+                  <div className="sticky top-5 z-10 flex justify-center pointer-events-none">
+                    <span className="bg-slate-900 text-slate-300 text-xs px-3 py-1 rounded-lg shadow-md font-medium tracking-wide">
+                      {group.label}
+                    </span>
                   </div>
+                  {group.messages.map((msg) => {
+                    const isLoneEmoji = isSingleEmoji(msg.text) && !msg.image;
+
+                    return (
+                      <div
+                        key={msg._id}
+                        className={`chat ${msg.senderId === authUser._id ? "chat-end" : "chat-start"}`}
+                      >
+                        <div
+                          className={`chat-bubble relative text-sm md:text-base max-w-[75%] w-fit md:max-w-md break-words ${
+                            isLoneEmoji
+                              ? "bg-transparent px-0 select-none"
+                              : msg.senderId === authUser._id
+                                ? "bg-cyan-600 text-white"
+                                : msg.image && !msg.text
+                                  ? "bg-transparent px-0"
+                                  : "bg-slate-800 text-slate-200"
+                          }`}
+                        >
+                          {msg.image && (
+                            <img
+                              src={msg.image}
+                              alt="Shared"
+                              className="rounded-lg max-h-48 h-fit w-fit object-contain"
+                            />
+                          )}
+                          {msg.text && (
+                            <p
+                              className={
+                                isLoneEmoji
+                                  ? "text-right text-5xl"
+                                  : msg.senderId === authUser._id
+                                    ? "text-end align-text-bottom"
+                                    : "text-start align-text-bottom"
+                              }
+                            >
+                              {msg.text}
+                            </p>
+                          )}
+                        </div>
+                        <p className="chat-footer text-xs mt-1 opacity-75 flex items-center justify-end gap-1">
+                          {new Date(msg.createdAt)
+                            .toLocaleString("en-IN", {
+                              timezone: "Asia/Kolkata",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })
+                            .toUpperCase()}
+                          {msg.senderId === authUser._id && (
+                            <span className="ml-1">
+                              {msg.status === "read" ? (
+                                <CheckCheck className="w-4 h-4 text-blue-500" />
+                              ) : msg.status === "delivered" ? (
+                                <CheckCheck className="w-4 h-4 text-slate-400" />
+                              ) : (
+                                <Check className="w-4 h-4 text-slate-400" />
+                              )}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    );
+                  })}
                 </div>
               );
             })}
