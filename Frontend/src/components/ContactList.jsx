@@ -7,13 +7,13 @@ function ContactList() {
   const { getAllContacts, allContacts, isUsersLoading, setSelectedUser } =
     useChatStore();
 
-  const {onlineUsers} = useAuthStore()
+  const { onlineUsers } = useAuthStore();
 
   useEffect(() => {
     getAllContacts();
   }, [getAllContacts]);
 
-  if(isUsersLoading) return <UsersLoadingSkeleton/>
+  if (isUsersLoading) return <UsersLoadingSkeleton />;
 
   return (
     <>
@@ -25,7 +25,7 @@ function ContactList() {
         >
           <div className="flex items-center gap-3">
             <div
-            className={`avatar ${onlineUsers.includes(contact._id) ? "online" : "offline"}`} ////TODO WITH SOCKET.IO
+              className={`avatar ${onlineUsers.includes(contact._id) ? "online" : "offline"}`} ////TODO WITH SOCKET.IO
             >
               <div className="size-12 rounded-full overflow-hidden">
                 <img

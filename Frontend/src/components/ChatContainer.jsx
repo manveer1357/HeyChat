@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { useChatStore } from "../store/useChatStore";
 import ChatHeader from "./ChatHeader";
@@ -53,6 +53,8 @@ function ChatContainer() {
   const { authUser } = useAuthStore();
   const messageEndRef = useRef(null);
 
+  const [selectedReply, setSelectedReply] = useState(null);
+
   useEffect(() => {
     getMessagesByUserId(selectedUser._id);
     subscribeToMessages();
@@ -71,6 +73,7 @@ function ChatContainer() {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
+
   const messageGroups = messages.reduce((groups, msg) => {
     const label = getChatDayLabel(msg.createdAt);
     const lastGroup = groups[groups.length - 1];
@@ -81,6 +84,7 @@ function ChatContainer() {
       groups.push({ label, messages: [msg] });
     }
 
+    console.log(groups);
     return groups;
   }, []);
 
@@ -118,37 +122,102 @@ function ChatContainer() {
                         key={msg._id}
                         className={`chat ${msg.senderId === authUser._id ? "chat-end" : "chat-start"}`}
                       >
+                        <div className="chat-image avatar">
+                          <div className="w-10 rounded-full">
+                            {msg.senderId === authUser._id ? (
+                              <img
+                                alt="Profile"
+                                src={authUser.profilePic || "/avatar.png"}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <img
+                                alt="Profile"
+                                src={selectedUser.profilePic || "/avatar.png"}
+                                className="w-full h-full object-cover"
+                              />
+                            )}
+                          </div>
+                        </div>
+
                         <div
                           className={`chat-bubble relative text-sm md:text-base max-w-[75%] w-fit md:max-w-md break-words ${
                             isLoneEmoji
                               ? "bg-transparent px-0 select-none"
                               : msg.senderId === authUser._id
-                                ? "bg-cyan-600 text-white"
+                                ? "bg-cyan-950 text-white"
                                 : msg.image && !msg.text
                                   ? "bg-transparent px-0"
                                   : "bg-slate-800 text-slate-200"
                           }`}
+                          tabIndex={0}
                         >
-                          {msg.image && (
-                            <img
-                              src={msg.image}
-                              alt="Shared"
-                              className="rounded-lg max-h-48 h-fit w-fit object-contain"
-                            />
-                          )}
-                          {msg.text && (
-                            <p
-                              className={
-                                isLoneEmoji
-                                  ? "text-right text-5xl"
-                                  : msg.senderId === authUser._id
-                                    ? "text-end align-text-bottom"
-                                    : "text-start align-text-bottom"
-                              }
+                          <div
+                            className={`dropdown-close dropdown dropdown-hover ${msg.senderId === authUser._id ? "dropdown-left" : "dropdown-right"}`}
+                          >
+                            <ul
+                              tabIndex={-1}
+                              className="dropdown-content menu bg-base-100 rounded-box z-1 w-[1/2] p-2 shadow-sm"
                             >
-                              {msg.text}
-                            </p>
-                          )}
+                              <li>
+                                <button onClick={() => setSelectedReply(msg)}>
+                                  Reply
+                                </button>
+                              </li>
+                            </ul>
+                            {msg.replyTo && (
+                              <div
+                                className={`p-2 mt-2 flex flex-col rounded-md gap-1 relative text-sm md:text-base break-words ${
+                                  msg.senderId === authUser._id
+                                    ? "bg-cyan-900 text-cyan-400 border-cyan-400 border-l-4 "
+                                    : "bg-slate-800 text-cyan-400 border-slate-400 border-l-4 "
+                                } text-slate-200`}
+                              >
+                                <span
+                                  className={`font-semibold text-xs ${
+                                    msg.senderId === authUser._id
+                                      ? "text-cyan-400 "
+                                      : "text-slate-400"
+                                  }`}
+                                >
+                                  {msg.replyTo.senderId === authUser._id
+                                    ? "You"
+                                    : selectedUser.fullName}
+                                </span>
+
+                                {msg.replyTo.image && (
+                                  <img
+                                    src={msg.replyTo.image}
+                                    alt="Preview"
+                                    className="w-full h-full object-cover rounded-lg border border-slate-700"
+                                  />
+                                )}
+                                {msg.replyTo.text}
+                              </div>
+                            )}
+                            {msg.image && (
+                              <img
+                                src={msg.image}
+                                alt="Shared"
+                                className="rounded-lg max-h-48 h-fit w-fit object-contain"
+                                tabIndex={0}
+                              />
+                            )}
+                            {msg.text && (
+                              <p
+                                className={
+                                  isLoneEmoji
+                                    ? "text-right text-5xl"
+                                    : msg.senderId === authUser._id
+                                      ? "text-end align-text-bottom"
+                                      : "text-start align-text-bottom"
+                                }
+                                tabIndex={0}
+                              >
+                                {msg.text}
+                              </p>
+                            )}
+                          </div>
                         </div>
                         <p className="chat-footer text-xs mt-1 opacity-75 flex items-center justify-end gap-1">
                           {new Date(msg.createdAt)
@@ -184,7 +253,10 @@ function ChatContainer() {
           <NoChatHistoryPlaceholder name={selectedUser.fullName} />
         )}
       </div>
-      <MessageInput />
+      <MessageInput
+        replyToMessage={selectedReply}
+        onCancelReply={() => setSelectedReply(null)}
+      />
     </section>
   );
 }

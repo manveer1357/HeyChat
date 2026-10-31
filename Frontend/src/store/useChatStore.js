@@ -68,6 +68,9 @@ export const useChatStore = create((set, get) => ({
       receiverId: selectedUser._id,
       text: messageData.text,
       image: messageData.image,
+      replyTo: messageData.replyTo
+        ? messages.find((message) => message._id === messageData.replyTo) || null
+        : null,
       createdAt: new Date().toISOString(),
       status: "sent",
       isOptimistic: true, // flag to identify optimistic messages (optional)

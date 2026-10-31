@@ -2,6 +2,7 @@ import cloudinary from "../lib/cloudinary.js";
 import { getRecieverSocketId, io } from "../lib/socket.js";
 import Message from "../models/message.js";
 import User from "../models/User.js";
+import mongoose from "mongoose";
 
 export const getAllContacts = async (req, res) => {
   try {
@@ -40,7 +41,9 @@ export const getMessagesByContactId = async (req, res) => {
         { senderId: myId, receiverId: contactToChatId },
         { senderId: contactToChatId, receiverId: myId },
       ],
-    }).sort({ createdAt: 1 });
+    })
+      .populate("replyTo", "senderId text image createdAt")
+      .sort({ createdAt: 1 });
 
     res.status(200).json(messages);
   } catch (error) {
@@ -51,7 +54,7 @@ export const getMessagesByContactId = async (req, res) => {
 
 export const sendMessage = async (req, res) => {
   try {
-    const { text, image } = req.body;
+    const { text, image, replyTo } = req.body;
     const { id: receiverId } = req.params;
     const senderId = req.user._id;
 
@@ -70,6 +73,24 @@ export const sendMessage = async (req, res) => {
       return res.status(404).json({ message: "Receiver not found" });
     }
 
+    if (replyTo) {
+      if (!mongoose.isValidObjectId(replyTo)) {
+        return res.status(400).json({ message: "Invalid replyTo ID" });
+      }
+
+      const refMessage = await Message.findOne({
+        _id: replyTo,
+        $or: [
+          { senderId, receiverId },
+          { senderId: receiverId, receiverId: senderId },
+        ],
+      });
+
+      if (!refMessage) {
+        return res.status(404).json({ message: "Original message not found" });
+      }
+    }
+
     let imageUrl;
     if (image) {
       const uploadedResponse = await cloudinary.uploader.upload(image);
@@ -83,10 +104,12 @@ export const sendMessage = async (req, res) => {
       receiverId,
       text,
       image: imageUrl,
+      replyTo,
       status: receiverSocketId ? "delivered" : "sent",
     });
 
     await newMessage.save();
+    await newMessage.populate("replyTo", "senderId text image createdAt");
 
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("newMessage", newMessage);

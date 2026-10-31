@@ -12,6 +12,10 @@ const messageSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    replyTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Message",
+    },
     text: {
       type: String,
       trim: true,

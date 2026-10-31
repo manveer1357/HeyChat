@@ -12,8 +12,8 @@ function ChatPage() {
   const { activeTab, selectedUser } = useChatStore();
 
   return (
-    <div className="relative w-full max-w-6xl h-[100dvh] md:h-[94dvh]">
-      <BorderAnimatedContainer>
+    <div className="relative w-full h-[100dvh]">
+      <div className="flex w-full h-full">
         {/* LEFT SIDE */}
         <div
           className={`w-full md:w-80 bg-slate-800/50 backdrop-blur-sm flex flex-col ${selectedUser ? "hidden md:flex" : ""}`}
@@ -32,7 +32,7 @@ function ChatPage() {
         >
           {selectedUser ? <ChatContainer /> : <NoConversationPlaceholder />}
         </div>
-      </BorderAnimatedContainer>
+      </div>
     </div>
   );
 }
